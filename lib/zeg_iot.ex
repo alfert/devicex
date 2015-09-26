@@ -3,14 +3,15 @@ defmodule Devicex.ZegIOT do
   API for Zühlke's IOT platform.
   """
   use HTTPoison.Base
-  @endpoint "fritz.box:80"
+  @endpoint "https://www.google.de"
+  # @endpoint "fritz.box:80"
 
   def process_url(url) do
     @endpoint <> url
   end
 
   def process_request_header(headers) do
-    [ {"Keep-Alive", ""} | headers]
+    [ {"Keep-Alive", "timeout=10"} | headers]
   end
 
 end
