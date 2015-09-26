@@ -17,15 +17,22 @@ defmodule Devicex do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Devicex.Supervisor]
     Supervisor.start_link(children, opts)
-    device_simulator(1000)
+    me = self
+    devs = 1..10 |>
+      Enum.map fn(_x) ->
+        spawn(fn -> device_simulator(1000, me) end)
+      end
+    receive do
+      {:ok, pid} -> :ok
+    end
   end
 
-  def device_simulator(0), do: :ok
-  def device_simulator(count) do
+  def device_simulator(0, parent), do: send(parent, {:ok, self})
+  def device_simulator(count, parent) do
     {:ok, response} = ZegIOT.get("/")
     IO.puts "Got response: #{response.status_code}"
     :timer.sleep(500)
-    device_simulator(count-1)
+    device_simulator(count-1, parent)
   end
 
 end
